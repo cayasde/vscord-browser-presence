@@ -672,7 +672,7 @@
             "image": "livescript"
         },
         "/\\.luau$|\\.rbx(?:lx|l|m|s)?$/": {
-            "image": "luau-new"
+            "image": "luau-blue"
         },
         "/\\.maeel$/": {
             "image": "maeel"
