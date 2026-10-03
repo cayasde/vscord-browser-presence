@@ -1,42 +1,36 @@
 <div align="center">
 
-[<img width="256" alt="VSCord Logo" src="https://i.imgur.com/n7ieZfW.png" />][vsmp-link]
-
-<br />
-
-[![Open VSX Version][shield-ovsx-version]][ovsx-link]
-[![Open VSX Downloads][shield-ovsx-downloads]][ovsx-link]
-[![Open VSX Rating][shield-ovsx-rating]][ovsx-link]
-
-[![Continuous Integration][shield-workflows-ci]][github-workflows-ci]
-[![Gitter Support Chat][shield-gitter-support]][gitter-vscord-support]
-
-[![Continuous Delivery][shield-workflows-cd]][github-workflows-cd]
+[<img width="256" alt="VSCord Logo" src="https://i.imgur.com/n7ieZfW.png" />](https://github.com/cayasde/vscord-browser-presence)
 
 </div>
 
 <br />
 
-# VSCord
+# VSCord Browser Presence
 
-Highly customizable [Discord Rich Presence](https://discord.com/rich-presence) extension for [Visual Studio Code](https://code.visualstudio.com/)
+Fork of [VSCord](https://github.com/LeonardSSH/vscord) that publishes VS Code activity through Discord's Social SDK. It does not require the Discord desktop client; Discord account authorization is handled through OAuth in a browser.
 
 > Remember to 🌟 this GitHub if you 💖 it.
 
-## Disclaimer
+## Requirements
 
-This extension does not work with snapstore / flatpak version of VSCode, please use the official version from the VSCode website!
+- Windows x64 and VS Code 1.53 or newer.
+- The Discord Social SDK C++ package, downloaded from the Discord Developer Portal.
+- A Discord application configured with the `http://127.0.0.1/callback` OAuth redirect and **Public Client** enabled.
+- MinGW-w64 `g++` available on `PATH` to build the native host.
+
+The extension stores its rotating OAuth refresh token using VS Code's encrypted SecretStorage. Do not copy the token into settings, source files, or chat.
+See Discord's [Social SDK getting started guide](https://discord.com/developers/docs/social-sdk/getting_started.html) and [SDK Terms](https://support-dev.discord.com/hc/en-us/articles/30225844245271-Discord-Social-SDK-Terms) for application setup and usage requirements.
 
 ## 📌 Features
 
 - Shows what you're working on!
-- Switch between 5 IDE names (`Code`, `Visual Studio Code`, `VSCodium`, `Antigravity` and `Cursor`) or a custom one if you wish!
+- Publish presence without a running Discord desktop client.
 - Packed with 60+ extension settings!
 - Tons of variable to use!
 - Support for over 130+ of the most popular languages!
 - Support custom images (using HTTP link)
 - Support custom button link!
-- Support flatpak / snapstore version of Discord!
 - Detect when you are Debugging!
 - Detect when you are using the [Insiders build](https://code.visualstudio.com/insiders/)!
 - Detect when you are Idling!
@@ -49,15 +43,17 @@ This extension does not work with snapstore / flatpak version of VSCode, please 
 
 ## 📥 Installation
 
-Launch VS Code Quick Open (Ctrl+P), paste the following command, and press enter.
+The Discord SDK binaries are not stored in this repository. Extract the SDK package from the Developer Portal, then build and install the extension locally:
 
+```powershell
+npm ci
+$env:DISCORD_SOCIAL_SDK_ROOT = "C:\path\to\discord_social_sdk"
+npm run build:social-sdk
+npx vsce package
+code --install-extension .\vscord-browser-presence-0.1.1.vsix
 ```
-ext install LeonardSSH.vscord
-```
 
-**OR**
-
-Use the **[Extension Marketplace](https://code.visualstudio.com/docs/editor/extension-gallery)**
+On first activation, the SDK opens Discord OAuth authorization in the default browser. The application ID is configured by `vscord.app.id`.
 
 ![a4](https://i.imgur.com/qMzox38.gif)
 
@@ -110,7 +106,7 @@ To contribute to this repository, feel free to create a new fork of the reposito
 2. Create a new branch in your fork.
 3. Make your changes.
 4. Commit your changes and push them.
-5. Submit a Pull Request [here](https://github.com/LeonardSSH/vscord/pulls)!
+5. Submit a Pull Request [here](https://github.com/cayasde/vscord-browser-presence/pulls)!
 
 ## 👨‍💻 Adding a new language
 
@@ -127,19 +123,3 @@ _Much of the code in this repository is based on [iCrawl/discord-vscode](https:/
 ## 📋 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-[vsmp-link]: https://marketplace.visualstudio.com/items?itemName=LeonardSSH.vscord
-[ovsx-link]: https://open-vsx.org/extension/LeonardSSH/vscord
-[shield-vsmp-version]: https://img.shields.io/visual-studio-marketplace/v/LeonardSSH.vscord?label=Visual%20Studio%20Marketplace
-[shield-vsmp-downloads]: https://img.shields.io/visual-studio-marketplace/d/LeonardSSH.vscord
-[shield-vsmp-installs]: https://img.shields.io/visual-studio-marketplace/i/LeonardSSH.vscord
-[shield-vsmp-rating]: https://img.shields.io/visual-studio-marketplace/r/LeonardSSH.vscord
-[shield-ovsx-version]: https://img.shields.io/open-vsx/v/LeonardSSH/vscord?label=OpenVSX%20Marketplace
-[shield-ovsx-downloads]: https://img.shields.io/open-vsx/dt/LeonardSSH/vscord
-[shield-ovsx-rating]: https://img.shields.io/open-vsx/rating/LeonardSSH/vscord
-[github-workflows-ci]: https://github.com/leonardssh/vscord/actions/workflows/CI.yml
-[shield-workflows-ci]: https://github.com/leonardssh/vscord/actions/workflows/CI.yml/badge.svg
-[github-workflows-cd]: https://github.com/leonardssh/vscord/actions/workflows/CD.yml
-[shield-workflows-cd]: https://github.com/leonardssh/vscord/actions/workflows/CD.yml/badge.svg
-[gitter-vscord-support]: https://gitter.im/LeonardSSH/vscord-support?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge
-[shield-gitter-support]: https://img.shields.io/badge/gitter-support%20chat-green?color=40aa8b

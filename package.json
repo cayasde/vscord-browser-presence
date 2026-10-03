@@ -1,18 +1,18 @@
 {
-    "name": "vscord",
-    "displayName": "Discord Rich Presence",
-    "version": "5.3.10",
-    "description": "Highly customizable Discord Rich Presence extension for Visual Studio Code",
-    "publisher": "LeonardSSH",
+    "name": "vscord-browser-presence",
+    "displayName": "VSCord Browser Presence",
+    "version": "0.1.1",
+    "description": "Discord Rich Presence for VS Code using the Discord Social SDK, without requiring the desktop client",
+    "publisher": "cayasde",
     "license": "MIT",
     "contributors": [
         "xhayper"
     ],
-    "repository": "https://github.com/LeonardSSH/vscord",
+    "repository": "https://github.com/cayasde/vscord-browser-presence",
     "bugs": {
-        "url": "https://github.com/LeonardSSH/vscord/issues"
+        "url": "https://github.com/cayasde/vscord-browser-presence/issues"
     },
-    "homepage": "https://github.com/LeonardSSH/vscord#readme",
+    "homepage": "https://github.com/cayasde/vscord-browser-presence#readme",
     "keywords": [
         "discord",
         "rich",
@@ -24,10 +24,7 @@
         "Visualization",
         "Other"
     ],
-    "extensionKind": [
-        "ui",
-        "workspace"
-    ],
+    "extensionKind": ["ui"],
     "galleryBanner": {
         "color": "#5865F2",
         "theme": "dark"
@@ -36,10 +33,10 @@
         "onStartupFinished"
     ],
     "main": "dist/extension.js",
-    "private": true,
     "icon": "assets/icon.png",
     "scripts": {
         "vscode:prepublish": "npm run package",
+        "build:social-sdk": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/build-social-sdk-host.ps1",
         "compile": "rspack",
         "watch": "rspack --watch",
         "package": "rspack --mode production --devtool hidden-source-map",
@@ -65,52 +62,52 @@
     "contributes": {
         "commands": [
             {
-                "command": "vscord.enable",
+                "command": "vscordBrowser.enable",
                 "title": "Enable Discord Presence",
                 "category": "VSCord"
             },
             {
-                "command": "vscord.disable",
+                "command": "vscordBrowser.disable",
                 "title": "Disable Discord Presence",
                 "category": "VSCord"
             },
             {
-                "command": "vscord.workspace.enable",
+                "command": "vscordBrowser.workspace.enable",
                 "title": "Enable Discord Presence in the current workspace",
                 "category": "VSCord"
             },
             {
-                "command": "vscord.workspace.disable",
+                "command": "vscordBrowser.workspace.disable",
                 "title": "Disable Discord Presence in the current workspace",
                 "category": "VSCord"
             },
             {
-                "command": "vscord.disconnect",
+                "command": "vscordBrowser.disconnect",
                 "title": "Disconnect from Discord Gateway",
                 "category": "VSCord"
             },
             {
-                "command": "vscord.reconnect",
+                "command": "vscordBrowser.reconnect",
                 "title": "Reconnect to Discord Gateway",
                 "category": "VSCord"
             },
             {
-                "command": "vscord.enablePrivacyMode",
+                "command": "vscordBrowser.enablePrivacyMode",
                 "title": "Enable Privacy Mode",
                 "category": "VSCord"
             },
             {
-                "command": "vscord.disablePrivacyMode",
+                "command": "vscordBrowser.disablePrivacyMode",
                 "title": "Disable Privacy Mode",
                 "category": "VSCord"
             },
             {
-                "command": "vscord.startIdling",
+                "command": "vscordBrowser.startIdling",
                 "title": "Start Idle",
                 "category": "VSCord"
             },
             {
-                "command": "vscord.stopIdling",
+                "command": "vscordBrowser.stopIdling",
                 "title": "Stop Idle",
                 "category": "VSCord"
             }
@@ -135,14 +132,14 @@
                             "Cursor",
                             "Custom"
                         ],
-                        "default": "Code",
-                        "description": "Choose the name you want the application to use.\nChoosing \"Custom\" will make it so it use the \"rpc.id\" as application id",
+                        "default": "Custom",
+                        "description": "Legacy desktop RPC setting. This fork uses vscord.app.id directly.",
                         "order": 2
                     },
                     "vscord.app.id": {
                         "type": "string",
-                        "default": "782685898163617802",
-                        "description": "Application id that will be used when `appName` is \"Custom\" or when `appName` is invalid",
+                        "default": "1555954900519624824",
+                        "description": "Discord application ID used by the Discord Social SDK.",
                         "order": 3
                     },
                     "vscord.app.privacyMode.enable": {
@@ -1372,7 +1369,7 @@
         }
     },
     "engines": {
-        "vscode": "^1.52.0"
+        "vscode": "^1.53.0"
     },
     "packageManager": "npm@11.16.0"
 }

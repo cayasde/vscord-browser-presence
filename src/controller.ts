@@ -1,5 +1,6 @@
 import { type Disposable, type WindowState, debug, languages, window, workspace } from "vscode";
-import { type SetActivity, type SetActivityResponse, Client } from "@xhayper/discord-rpc";
+import { type SetActivity } from "@xhayper/discord-rpc";
+import { SocialSdkClient, type SecureSecretStorage } from "./socialSdkClient";
 import type { GatewayActivityButton } from "discord-api-types/v10";
 import { getApplicationId } from "./helpers/getApplicationId";
 import { activity, onDiagnosticsChange } from "./activity";
@@ -19,7 +20,7 @@ export class RPCController {
     manualIdling = false;
     state: SetActivity = {};
     debug = false;
-    client: Client;
+    client: SocialSdkClient;
 
     private idleTimeout: NodeJS.Timeout | undefined;
     private iconTimeout: NodeJS.Timeout | undefined;
@@ -31,22 +32,11 @@ export class RPCController {
 
     constructor(clientId: string, debug = false) {
         const config = getConfig();
-        this.client = new Client({ clientId });
+        this.client = new SocialSdkClient(clientId);
         this.debug = debug;
         this.manualIdleMode = config.get(CONFIG_KEYS.Status.Idle.Check) === false;
 
         editor.setStatusBarItem(StatusBarMode.Pending);
-
-        this.client.login().catch(async (error: Error) => {
-            const config = getConfig();
-
-            logError("Encountered following error while trying to login:", error);
-            editor.setStatusBarItem(StatusBarMode.Disconnected);
-            editor.errorMessageFailedToConnect(config, error);
-            await this.client?.destroy();
-            logInfo("[002] Destroyed Discord RPC client");
-        });
-
         this.client.on("debug", (...data) => {
             if (!this.debug) return;
             logInfo("[003] Debug:", ...data);
@@ -56,8 +46,23 @@ export class RPCController {
         this.client.on("disconnected", this.onDisconnected.bind(this));
     }
 
+    initialize(extensionPath: string, secrets: SecureSecretStorage): void {
+        this.client.configure(extensionPath, secrets);
+        if (!getConfig().get(CONFIG_KEYS.Enable)) return;
+
+        this.client.login().catch(async (error: Error) => {
+            const config = getConfig();
+
+            logError("Encountered following error while trying to login:", error);
+            editor.setStatusBarItem(StatusBarMode.Disconnected);
+            editor.errorMessageFailedToConnect(config, error);
+            await this.client?.destroy();
+            logInfo("[002] Destroyed Discord Social SDK client");
+        });
+    }
+
     private onReady() {
-        logInfo("Successfully connected to Discord");
+        logInfo("Successfully connected to Discord Social SDK");
         this.cleanUp();
 
         if (this.enabled) void this.enable();
@@ -166,8 +171,7 @@ export class RPCController {
     async login() {
         const { clientId } = getApplicationId(getConfig());
         logInfo("[004] Debug:", `Logging in with client ID "${clientId}"`);
-        logInfo("[004] Debug:", "Login - isConnected", this.client.isConnected, "isReady", this.client.clientId);
-        logInfo("[004] Debug:", `Login - ${this.client}`);
+        logInfo("[004] Debug:", "Login - isConnected", this.client.isConnected, "applicationId", this.client.clientId);
 
         if (this.client.isConnected && this.client.clientId === clientId) return;
 
@@ -177,7 +181,7 @@ export class RPCController {
         else if (!this.client.isConnected) await this.client.login();
     }
 
-    async sendActivity(isViewing = false, isIdling = false): Promise<SetActivityResponse | undefined> {
+    async sendActivity(isViewing = false, isIdling = false): Promise<void> {
         if (!this.enabled) return;
         if (this.manualIdleMode) isIdling = this.manualIdling;
         this.checkCanSend(isIdling);
@@ -213,17 +217,17 @@ export class RPCController {
     }
 
     async enable() {
-        logInfo("[004] Debug:", "Enabling Discord Rich Presence");
+        logInfo("[004] Debug:", "Enabling Discord Social SDK Rich Presence");
 
         this.enabled = true;
 
         await this.login();
         logInfo("[004] Debug:", "Client Should be logged in");
-        logInfo("[004] Debug:", `Enable - ${this.client}`);
+        logInfo("[004] Debug:", `Enable - connected=${this.client.isConnected}`);
 
         editor.setStatusBarItem(StatusBarMode.Succeeded);
 
-        logInfo("[004] Debug:", "Enabled - isConnected", this.client.isConnected, "isReady", this.client.clientId);
+        logInfo("[004] Debug:", "Enabled - isConnected", this.client.isConnected);
         await this.activityThrottle.callable();
         this.cleanUp();
         this.listen();

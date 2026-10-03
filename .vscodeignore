@@ -4,6 +4,9 @@ node_modules/
 .vscode/
 out/
 src/
+scripts/
+native/*.cpp
+*.vsix
 
 ADDING_LANGUAGE.md
 package-lock.json

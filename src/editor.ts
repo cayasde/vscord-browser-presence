@@ -35,18 +35,18 @@ class EditorController implements Disposable {
         }
 
         const whenDisconnected: Partial<StatusBarItem> = {
-            text: "$(warning) Discord RPC",
+            text: "$(warning) Discord Presence",
             tooltip: "Disconnected. Click to reconnect",
-            command: "vscord.reconnect"
+            command: "vscordBrowser.reconnect"
         };
         const whenPending: Partial<StatusBarItem> = {
-            text: "$(pulse) Discord RPC",
-            tooltip: "Please, wait. Connecting to Discord Gateway..."
+            text: "$(pulse) Discord Presence",
+            tooltip: "Please wait. Connecting to Discord Social SDK..."
         };
         const whenSucceeded: Partial<StatusBarItem> = {
-            text: "Discord RPC",
-            tooltip: "Connected to Discord Gateway. Click to disconnect",
-            command: "vscord.disconnect"
+            text: "Discord Presence",
+            tooltip: "Connected to Discord Social SDK. Click to disconnect",
+            command: "vscordBrowser.disconnect"
         };
         const statusBarItemByMode = {
             [StatusBarMode.Disconnected]: whenDisconnected,
@@ -102,7 +102,7 @@ class EditorController implements Disposable {
 
     #errorMessageFailedToConnectSelect(config: ExtensionConfiguration, key: string, selection?: string) {
         if (selection === "Reconnect") {
-            commands.executeCommand("vscord.reconnect");
+            commands.executeCommand("vscordBrowser.reconnect");
         } else if (selection === "Show output") {
             outputChannel.show(true);
         } else if (selection === "Don't show again") {
@@ -116,7 +116,7 @@ class EditorController implements Disposable {
 
         const buttons = ["Reconnect", "Show output"];
         if (!(error instanceof Error)) {
-            const message = "Failed to connect to Discord Gateway.";
+            const message = "Failed to connect to Discord Social SDK.";
             window
                 .showErrorMessage(message, ...buttons)
                 .then((selection) => this.#errorMessageFailedToConnectSelect(config, "", selection));
@@ -138,7 +138,7 @@ class EditorController implements Disposable {
             buttons.push("Don't show again");
         }
 
-        const message = `Failed to connect to Discord Gateway: ${error.name}.`;
+        const message = `Failed to connect to Discord Social SDK: ${error.name}.`;
         window
             .showErrorMessage(message, ...buttons)
             .then((selection) => this.#errorMessageFailedToConnectSelect(config, suppressConfigKey, selection));

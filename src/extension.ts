@@ -6,6 +6,7 @@ import { CONFIG_KEYS } from "./constants";
 import { getConfig } from "./config";
 import { logInfo } from "./logger";
 import { dataClass } from "./data";
+import type { SecureSecretStorage } from "./socialSdkClient";
 
 const controller = new RPCController(
     getApplicationId(getConfig()).clientId,
@@ -65,7 +66,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
         await controller.sendActivity(dataClass.editor != null);
     };
 
-    const enableCommand = commands.registerCommand("vscord.enable", async () => {
+    const enableCommand = commands.registerCommand("vscordBrowser.enable", async () => {
         await disable(false);
         await enable(false);
 
@@ -75,7 +76,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
             await window.showInformationMessage("Enabled Discord Rich Presence");
     });
 
-    const disableCommand = commands.registerCommand("vscord.disable", async () => {
+    const disableCommand = commands.registerCommand("vscordBrowser.disable", async () => {
         logInfo("Disabled Discord Rich Presence");
 
         await disable(false);
@@ -84,7 +85,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
             await window.showInformationMessage("Disabled Discord Rich Presence");
     });
 
-    const enableWorkspaceCommand = commands.registerCommand("vscord.workspace.enable", async () => {
+    const enableWorkspaceCommand = commands.registerCommand("vscordBrowser.workspace.enable", async () => {
         logInfo("Enabled Discord Rich Presence");
 
         await disable();
@@ -94,7 +95,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
             await window.showInformationMessage("Enabled Discord Rich Presence for this workspace");
     });
 
-    const disableWorkspaceCommand = commands.registerCommand("vscord.workspace.disable", async () => {
+    const disableWorkspaceCommand = commands.registerCommand("vscordBrowser.workspace.disable", async () => {
         logInfo("Disabled Discord Rich Presence");
 
         await disable();
@@ -103,7 +104,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
             await window.showInformationMessage("Disabled Discord Rich Presence for this workspace");
     });
 
-    const reconnectCommand = commands.registerCommand("vscord.reconnect", async () => {
+    const reconnectCommand = commands.registerCommand("vscordBrowser.reconnect", async () => {
         logInfo("Reconnecting to Discord Gateway...");
 
         editor.setStatusBarItem(StatusBarMode.Pending);
@@ -118,7 +119,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
             });
     });
 
-    const disconnectCommand = commands.registerCommand("vscord.disconnect", async () => {
+    const disconnectCommand = commands.registerCommand("vscordBrowser.disconnect", async () => {
         logInfo("Disconnecting from Discord Gateway...");
 
         await controller.destroy();
@@ -126,7 +127,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
         editor.setStatusBarItem(StatusBarMode.Disconnected);
     });
 
-    const enablePrivacyModeCommand = commands.registerCommand("vscord.enablePrivacyMode", async () => {
+    const enablePrivacyModeCommand = commands.registerCommand("vscordBrowser.enablePrivacyMode", async () => {
         logInfo("Enabled Privacy Mode");
 
         await togglePrivacyMode(true);
@@ -135,7 +136,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
             await window.showInformationMessage("Enabled Privacy Mode.");
     });
 
-    const disablePrivacyModeCommand = commands.registerCommand("vscord.disablePrivacyMode", async () => {
+    const disablePrivacyModeCommand = commands.registerCommand("vscordBrowser.disablePrivacyMode", async () => {
         logInfo("Disabled Privacy Mode");
 
         await togglePrivacyMode(false);
@@ -144,7 +145,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
             await window.showInformationMessage("Disabled Privacy Mode.");
     });
 
-    const startIdlingCommand = commands.registerCommand("vscord.startIdling", async () => {
+    const startIdlingCommand = commands.registerCommand("vscordBrowser.startIdling", async () => {
         logInfo("Started Idling");
 
         controller.manualIdling = true;
@@ -154,7 +155,7 @@ export const registerCommands = (ctx: ExtensionContext) => {
             await window.showInformationMessage("Started Idling.");
     });
 
-    const stopIdlingCommand = commands.registerCommand("vscord.stopIdling", async () => {
+    const stopIdlingCommand = commands.registerCommand("vscordBrowser.stopIdling", async () => {
         logInfo("Stopped Idling");
 
         controller.manualIdling = false;
@@ -181,12 +182,17 @@ export const registerCommands = (ctx: ExtensionContext) => {
 };
 
 export async function activate(ctx: ExtensionContext) {
-    logInfo("Discord Rich Presence for VS Code activated.");
+    logInfo("VSCord Browser Presence for VS Code activated.");
     editor.setStatusBarItem(StatusBarMode.Pending);
     registerCommands(ctx);
     registerListeners(ctx);
 
-    if (!getConfig().get(CONFIG_KEYS.Enable)) await controller.disable();
+    const contextWithSecrets = ctx as ExtensionContext & { secrets: SecureSecretStorage };
+    controller.initialize(ctx.extensionPath, contextWithSecrets.secrets);
+    if (!getConfig().get(CONFIG_KEYS.Enable)) {
+        await controller.disable();
+        editor.setStatusBarItem(StatusBarMode.Disabled);
+    }
 }
 
 export async function deactivate() {
@@ -194,5 +200,5 @@ export async function deactivate() {
     editor.dispose();
     dataClass.dispose();
     await controller.destroy();
-    logInfo("[004] Destroyed Discord RPC client");
+    logInfo("[004] Destroyed Discord Social SDK client");
 }
