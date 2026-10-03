@@ -1,7 +1,7 @@
 {
     "name": "vscord-browser-presence",
     "displayName": "VSCord Browser Presence",
-    "version": "0.1.17",
+    "version": "0.1.18",
     "description": "Discord Rich Presence for VS Code using the Discord Social SDK, without requiring the desktop client",
     "publisher": "cayasde",
     "license": "MIT",
@@ -409,7 +409,7 @@
                     },
                     "vscord.status.image.large.idle.text": {
                         "type": "string",
-                        "default": "{git_status}",
+                        "default": "",
                         "description": "The large text to show when idling."
                     },
                     "vscord.status.image.large.viewing.key": {
@@ -419,7 +419,7 @@
                     },
                     "vscord.status.image.large.viewing.text": {
                         "type": "string",
-                        "default": "{git_status}",
+                        "default": "",
                         "description": "The large text to show when viewing a file."
                     },
                     "vscord.status.image.large.editing.key": {
@@ -429,7 +429,7 @@
                     },
                     "vscord.status.image.large.editing.text": {
                         "type": "string",
-                        "default": "{git_status}",
+                        "default": "",
                         "description": "The large text to show when editing a file."
                     },
                     "vscord.status.image.large.debugging.key": {
@@ -439,7 +439,7 @@
                     },
                     "vscord.status.image.large.debugging.text": {
                         "type": "string",
-                        "default": "{git_status}",
+                        "default": "",
                         "description": "The large text to show when debugging"
                     },
                     "vscord.status.image.large.notInFile.key": {
@@ -449,7 +449,7 @@
                     },
                     "vscord.status.image.large.notInFile.text": {
                         "type": "string",
-                        "default": "{git_status}",
+                        "default": "",
                         "description": "The large text to show when you are not in a file."
                     },
                     "vscord.status.image.small.idle.key": {

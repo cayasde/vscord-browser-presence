@@ -50,7 +50,7 @@ npm ci
 $env:DISCORD_SOCIAL_SDK_ROOT = "C:\path\to\discord_social_sdk"
 npm run build:social-sdk
 npx vsce package
-code --install-extension .\vscord-browser-presence-0.1.17.vsix
+code --install-extension .\vscord-browser-presence-0.1.18.vsix
 ```
 
 On first activation, the SDK opens Discord OAuth authorization in the default browser. The application ID is configured by `vscord.app.id`. Set `vscord.app.activityName` to customize the name displayed after "Competing in"; leave it empty to use the Discord application name.
