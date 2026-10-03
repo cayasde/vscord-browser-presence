@@ -439,10 +439,13 @@ export const getTotalProblems = (countedSeverities: PROBLEM_LEVEL[]): number => 
 export const replaceGitInfo = (text: string, excluded = false): string => {
     text = text.slice();
 
+    const branch = excluded ? undefined : dataClass.gitBranchName;
+    const branchText = excluded ? FAKE_EMPTY : (branch ?? (dataClass.gitRepoPath ? "no-branch" : "no-git"));
+
     const replaceMap = new Map([
         ["{git_owner}", (!excluded ? dataClass.gitRemoteUrl?.owner : undefined) ?? FAKE_EMPTY],
         ["{git_repo}", (!excluded ? (dataClass.gitRemoteUrl?.name ?? dataClass.gitRepoName) : undefined) ?? FAKE_EMPTY],
-        ["{git_branch}", (!excluded ? dataClass.gitBranchName : undefined) ?? FAKE_EMPTY],
+        ["{git_branch}", branchText],
 
         //  http, https, ssh, git
         ["{git_protocol}", (!excluded ? dataClass.gitRemoteUrl?.protocol : undefined) ?? FAKE_EMPTY],

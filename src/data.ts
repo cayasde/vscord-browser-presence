@@ -7,6 +7,7 @@ import { getConfig } from "./config";
 import { logInfo } from "./logger";
 import {
     type Disposable,
+    EventEmitter,
     type Extension,
     type TextEditor,
     type WorkspaceFolder,
@@ -40,6 +41,9 @@ export class Data implements Disposable {
 
     private rootListeners: Disposable[] = [];
     private gitApiListeners: Disposable[] = [];
+    private readonly gitInfoChanged = new EventEmitter<void>();
+
+    public readonly onDidChangeGitInfo = this.gitInfoChanged.event;
 
     public editor: TextEditor | undefined;
 
@@ -62,6 +66,7 @@ export class Data implements Disposable {
                 if (e) this.debug(`root(): window.onDidChangeActiveTextEditor: got URI '${e.document.uri.scheme}'`);
 
                 this.editor = e;
+                this.updateGitInfo();
             })
         );
     }
@@ -224,11 +229,13 @@ export class Data implements Disposable {
             this._repo = undefined;
             this._remote = undefined;
             this.debug(`updateGitInfo(): repo undefined, no api`);
+            this.gitInfoChanged.fire();
             return;
         }
         this._repo = this.repo(this._gitApi);
         this._remote = this.remote(this._repo);
         this.debug(`updateGitInfo(): repo ${this.gitRepoPath ?? ""}`);
+        this.gitInfoChanged.fire();
     }
 
     private repo(api: GitApi): Repository | undefined {
@@ -264,6 +271,7 @@ export class Data implements Disposable {
         this.gitApiListeners = [];
         for (const listener of this.rootListeners) listener.dispose();
         this.rootListeners = [];
+        this.gitInfoChanged.dispose();
     }
 
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

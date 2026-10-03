@@ -111,6 +111,10 @@ export class RPCController {
             logInfo("onDidChangeWindowState()");
             this.checkIdle(e);
         });
+        const gitInfoChange = dataClass.onDidChangeGitInfo(() => {
+            this.activityThrottle.reset();
+            void this.activityThrottle.callable();
+        });
 
         // fire checkIdle at least once after loading
         this.checkIdle(window.state);
@@ -118,7 +122,7 @@ export class RPCController {
         if (config.get(CONFIG_KEYS.Status.Problems.Enabled)) this.listeners.push(diagnosticsChange);
         if (config.get(CONFIG_KEYS.Status.Idle.Check)) this.listeners.push(changeWindowState);
 
-        this.listeners.push(fileSwitch, fileEdit, fileSelectionChanged, debugStart, debugEnd);
+        this.listeners.push(fileSwitch, fileEdit, fileSelectionChanged, debugStart, debugEnd, gitInfoChange);
     }
 
     private checkCanSend(isIdling: boolean): boolean {
