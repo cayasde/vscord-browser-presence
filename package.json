@@ -1,7 +1,7 @@
 {
     "name": "vscord-browser-presence",
     "displayName": "VSCord Browser Presence",
-    "version": "0.1.7",
+    "version": "0.1.8",
     "description": "Discord Rich Presence for VS Code using the Discord Social SDK, without requiring the desktop client",
     "publisher": "cayasde",
     "license": "MIT",
@@ -454,52 +454,52 @@
                     },
                     "vscord.status.image.small.idle.key": {
                         "type": "string",
-                        "default": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/idle.png",
+                        "default": "",
                         "description": "The image url to use when idling."
                     },
                     "vscord.status.image.small.idle.text": {
                         "type": "string",
-                        "default": "zZz",
+                        "default": "",
                         "description": "The small text to show when idling."
                     },
                     "vscord.status.image.small.viewing.key": {
                         "type": "string",
-                        "default": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/{app_id}.png",
+                        "default": "",
                         "description": "The image url to use when viewing a file."
                     },
                     "vscord.status.image.small.viewing.text": {
                         "type": "string",
-                        "default": "{app_name}",
+                        "default": "",
                         "description": "The small text to show when viewing a file."
                     },
                     "vscord.status.image.small.editing.key": {
                         "type": "string",
-                        "default": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/{app_id}.png",
+                        "default": "",
                         "description": "The image url to use when editing a file."
                     },
                     "vscord.status.image.small.editing.text": {
                         "type": "string",
-                        "default": "{app_name}",
+                        "default": "",
                         "description": "The small text to show when editing a file."
                     },
                     "vscord.status.image.small.debugging.key": {
                         "type": "string",
-                        "default": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/debugging.png",
+                        "default": "",
                         "description": "The image url to use when debugging."
                     },
                     "vscord.status.image.small.debugging.text": {
                         "type": "string",
-                        "default": "{app_name}",
+                        "default": "",
                         "description": "The small text to show when debugging."
                     },
                     "vscord.status.image.small.notInFile.key": {
                         "type": "string",
-                        "default": "https://raw.githubusercontent.com/LeonardSSH/vscord/main/assets/icons/idle.png",
+                        "default": "",
                         "description": "The image url to use when you are not in a file."
                     },
                     "vscord.status.image.small.notInFile.text": {
                         "type": "string",
-                        "default": "Snoozin...",
+                        "default": "",
                         "description": "The small text to show when you are not in a file."
                     }
                 }
