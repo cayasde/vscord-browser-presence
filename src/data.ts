@@ -18,6 +18,15 @@ import {
 
 const ALLOWED_SCHEME = ["file", "vscode-remote", "untitled", "vsls"];
 const API_VERSION: Parameters<GitExtension["getAPI"]>["0"] = 1;
+// Numeric values mirror the Git extension's Status enum in src/@types/git.d.ts.
+const GIT_STATUS = {
+    INDEX_DELETED: 2,
+    MODIFIED: 5,
+    DELETED: 6,
+    INTENT_TO_ADD: 9,
+    INTENT_TO_RENAME: 10,
+    TYPE_CHANGED: 11
+} as const;
 
 function extractRepo(repos: Repository[], comparePath: string): Repository | undefined {
     const filterBySub = repos.filter((v) => {
@@ -186,6 +195,35 @@ export class Data implements Disposable {
         const v = this._repo?.state.HEAD?.name;
         this.debug(`gitBranchName(): ${v ?? ""}`);
         return v;
+    }
+
+    public get gitStatusSummary(): string {
+        const state = this._repo?.state;
+        if (!state) return "Working tree clean";
+
+        const modifiedStatuses = [
+            GIT_STATUS.MODIFIED,
+            GIT_STATUS.TYPE_CHANGED,
+            GIT_STATUS.INTENT_TO_ADD,
+            GIT_STATUS.INTENT_TO_RENAME
+        ];
+        const modified = state.workingTreeChanges.filter(({ status }) => modifiedStatuses.includes(status)).length;
+        const deleted =
+            state.indexChanges.filter(({ status }) => status === GIT_STATUS.INDEX_DELETED).length +
+            state.workingTreeChanges.filter(({ status }) => status === GIT_STATUS.DELETED).length;
+        const summaryParts: Array<[number, string]> = [
+            [state.indexChanges.length, "S"],
+            [modified, "M"],
+            [state.untrackedChanges.length, "?"],
+            [deleted, "D"],
+            [state.mergeChanges.length, "!"]
+        ];
+        const summary = summaryParts
+            .filter(([count]) => count > 0)
+            .map(([count, label]) => `${label}${count}`)
+            .join(" ");
+
+        return summary || "Working tree clean";
     }
 
     private async requireGit(): Promise<Extension<GitExtension> | undefined> {

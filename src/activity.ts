@@ -446,6 +446,7 @@ export const replaceGitInfo = (text: string, excluded = false): string => {
         ["{git_owner}", (!excluded ? dataClass.gitRemoteUrl?.owner : undefined) ?? FAKE_EMPTY],
         ["{git_repo}", (!excluded ? (dataClass.gitRemoteUrl?.name ?? dataClass.gitRepoName) : undefined) ?? FAKE_EMPTY],
         ["{git_branch}", branchText],
+        ["{git_status}", excluded ? FAKE_EMPTY : dataClass.gitStatusSummary],
 
         //  http, https, ssh, git
         ["{git_protocol}", (!excluded ? dataClass.gitRemoteUrl?.protocol : undefined) ?? FAKE_EMPTY],
