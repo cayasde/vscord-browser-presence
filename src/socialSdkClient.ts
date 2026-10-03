@@ -3,6 +3,8 @@ import { EventEmitter } from "node:events";
 import { createInterface } from "node:readline";
 import { join } from "node:path";
 import type { SetActivity } from "@xhayper/discord-rpc";
+import { getConfig } from "./config";
+import { CONFIG_KEYS } from "./constants";
 import { logError, logInfo } from "./logger";
 
 const REFRESH_TOKEN_KEY = "vscord.socialSdk.refreshToken";
@@ -212,6 +214,7 @@ export class SocialSdkClient extends EventEmitter {
 
     private setActivity(activity: SetActivity): Promise<void> {
         const buttons = activity.buttons ?? [];
+        const activityName = getConfig().get(CONFIG_KEYS.App.ActivityName, "").trim();
         const startTimestamp = activity.startTimestamp instanceof Date
             ? activity.startTimestamp.getTime()
             : activity.startTimestamp ?? 0;
@@ -227,7 +230,8 @@ export class SocialSdkClient extends EventEmitter {
             this.encode(buttons[0]?.label),
             this.encode(buttons[0]?.url),
             this.encode(buttons[1]?.label),
-            this.encode(buttons[1]?.url)
+            this.encode(buttons[1]?.url),
+            this.encode(activityName)
         ];
         this.send(fields.join("\t"));
         return Promise.resolve();

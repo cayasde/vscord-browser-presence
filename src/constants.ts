@@ -13,6 +13,7 @@ export const CONFIG_KEYS = {
     App: {
         Id: "app.id" as const,
         Name: "app.name" as const,
+        ActivityName: "app.activityName" as const,
         PrivacyMode: "app.privacyMode.enable" as const,
         WhitelistEnabled: "app.whitelistEnabled" as const,
         whitelistIsBlacklist: "app.whitelistIsBlacklist" as const,

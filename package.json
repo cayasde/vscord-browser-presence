@@ -1,7 +1,7 @@
 {
     "name": "vscord-browser-presence",
     "displayName": "VSCord Browser Presence",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "description": "Discord Rich Presence for VS Code using the Discord Social SDK, without requiring the desktop client",
     "publisher": "cayasde",
     "license": "MIT",
@@ -141,6 +141,12 @@
                         "default": "1555954900519624824",
                         "description": "Discord application ID used by the Discord Social SDK.",
                         "order": 3
+                    },
+                    "vscord.app.activityName": {
+                        "type": "string",
+                        "default": "",
+                        "description": "Override the app name shown in Discord Rich Presence. Leave empty to use the Discord application name.",
+                        "order": 3.5
                     },
                     "vscord.app.privacyMode.enable": {
                         "type": "boolean",

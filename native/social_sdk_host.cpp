@@ -167,7 +167,7 @@ private:
             } else if (fields[0] == "TOKEN_STORE_FAILED") {
                 pendingAccessToken_.clear();
                 emit("ERROR", "VS Code could not securely store the Discord refresh token.");
-            } else if (fields[0] == "PRESENCE" && fields.size() == 12) {
+            } else if (fields[0] == "PRESENCE" && fields.size() == 13) {
                 setPresence(fields);
             } else if (fields[0] == "CLEAR") {
                 client_.ClearRichPresence();
@@ -253,6 +253,9 @@ private:
     {
         discordpp::Activity activity{};
         activity.SetType(discordpp::ActivityTypes::Playing);
+
+        const auto activityName = decodeBase64(fields[12]);
+        if (!activityName.empty()) activity.SetName(activityName);
 
         const auto details = decodeBase64(fields[1]);
         const auto state = decodeBase64(fields[2]);
