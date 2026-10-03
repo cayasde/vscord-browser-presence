@@ -1,7 +1,7 @@
 {
     "name": "vscord-browser-presence",
     "displayName": "VSCord Browser Presence",
-    "version": "0.1.18",
+    "version": "0.1.19",
     "description": "Discord Rich Presence for VS Code using the Discord Social SDK, without requiring the desktop client",
     "publisher": "cayasde",
     "license": "MIT",
@@ -524,17 +524,17 @@
                                         "properties": {
                                             "enabled": {
                                                 "type": "boolean",
-                                                "default": false
+                                                "default": true
                                             },
                                             "label": {
                                                 "type": "string",
-                                                "default": "Active Label Button 1",
+                                                "default": "🐙 GitHub",
                                                 "minLength": 1
                                             },
                                             "url": {
                                                 "type": "string",
                                                 "description": "The url to open when the button is clicked.",
-                                                "default": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                                                "default": "https://github.com/cayasde",
                                                 "minLength": 1
                                             }
                                         }
@@ -545,17 +545,17 @@
                                         "properties": {
                                             "enabled": {
                                                 "type": "boolean",
-                                                "default": false
+                                                "default": true
                                             },
                                             "label": {
                                                 "type": "string",
-                                                "default": "Inactive Label Button 1",
+                                                "default": "🐙 GitHub",
                                                 "minLength": 1
                                             },
                                             "url": {
                                                 "type": "string",
                                                 "description": "The url to open when the button is clicked.",
-                                                "default": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                                                "default": "https://github.com/cayasde",
                                                 "minLength": 1
                                             }
                                         }
@@ -566,17 +566,17 @@
                                         "properties": {
                                             "enabled": {
                                                 "type": "boolean",
-                                                "default": false
+                                                "default": true
                                             },
                                             "label": {
                                                 "type": "string",
-                                                "default": "Idle Label Button 1",
+                                                "default": "🐙 GitHub",
                                                 "minLength": 1
                                             },
                                             "url": {
                                                 "type": "string",
                                                 "description": "The url to open when the button is clicked.",
-                                                "default": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                                                "default": "https://github.com/cayasde",
                                                 "minLength": 1
                                             }
                                         }
@@ -595,13 +595,13 @@
                                                     },
                                                     "label": {
                                                         "type": "string",
-                                                        "default": "View Repository",
+                                                        "default": "🐙 GitHub",
                                                         "minLength": 1
                                                     },
                                                     "url": {
                                                         "type": "string",
                                                         "description": "The url to open when the button is clicked.",
-                                                        "default": "{git_url}",
+                                                        "default": "https://github.com/cayasde",
                                                         "minLength": 1
                                                     }
                                                 }
@@ -615,13 +615,13 @@
                                                     },
                                                     "label": {
                                                         "type": "string",
-                                                        "default": "View Repository",
+                                                        "default": "🐙 GitHub",
                                                         "minLength": 1
                                                     },
                                                     "url": {
                                                         "type": "string",
                                                         "description": "The url to open when the button is clicked.",
-                                                        "default": "{git_url}",
+                                                        "default": "https://github.com/cayasde",
                                                         "minLength": 1
                                                     }
                                                 }
@@ -635,13 +635,13 @@
                                                     },
                                                     "label": {
                                                         "type": "string",
-                                                        "default": "Active Label Button 1",
+                                                        "default": "🐙 GitHub",
                                                         "minLength": 1
                                                     },
                                                     "url": {
                                                         "type": "string",
                                                         "description": "The url to open when the button is clicked.",
-                                                        "default": "{git_url}",
+                                                        "default": "https://github.com/cayasde",
                                                         "minLength": 1
                                                     }
                                                 }
@@ -796,34 +796,34 @@
                                 "enabled": true,
                                 "active": {
                                     "enabled": true,
-                                    "label": "Active Label Button 1",
-                                    "url": "https://github.com/leonardssh/vscord"
+                                    "label": "🐙 GitHub",
+                                    "url": "https://github.com/cayasde"
                                 },
                                 "inactive": {
                                     "enabled": true,
-                                    "label": "Inactive Label Button 1",
-                                    "url": "https://github.com/leonardssh/vscord"
+                                    "label": "🐙 GitHub",
+                                    "url": "https://github.com/cayasde"
                                 },
                                 "idle": {
                                     "enabled": true,
-                                    "label": "Idle Label Button 1",
-                                    "url": "https://github.com/leonardssh/vscord"
+                                    "label": "🐙 GitHub",
+                                    "url": "https://github.com/cayasde"
                                 },
                                 "git": {
                                     "active": {
                                         "enabled": true,
-                                        "label": "View Repository",
-                                        "url": "{git_url}"
+                                        "label": "🐙 GitHub",
+                                        "url": "https://github.com/cayasde"
                                     },
                                     "inactive": {
                                         "enabled": true,
-                                        "label": "View Repository",
-                                        "url": "{git_url}"
+                                        "label": "🐙 GitHub",
+                                        "url": "https://github.com/cayasde"
                                     },
                                     "idle": {
                                         "enabled": true,
-                                        "label": "View Repository",
-                                        "url": "{git_url}"
+                                        "label": "🐙 GitHub",
+                                        "url": "https://github.com/cayasde"
                                     }
                                 }
                             }
@@ -835,44 +835,44 @@
                     },
                     "vscord.status.buttons.button1.active.enabled": {
                         "type": "boolean",
-                        "default": false
+                        "default": true
                     },
                     "vscord.status.buttons.button1.active.label": {
                         "type": "string",
-                        "default": "Active Label Button 1",
+                        "default": "🐙 GitHub",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.active.url": {
                         "type": "string",
-                        "default": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                        "default": "https://github.com/cayasde",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.inactive.enabled": {
                         "type": "boolean",
-                        "default": false
+                        "default": true
                     },
                     "vscord.status.buttons.button1.inactive.label": {
                         "type": "string",
-                        "default": "Inactive Label Button 1",
+                        "default": "🐙 GitHub",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.inactive.url": {
                         "type": "string",
-                        "default": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                        "default": "https://github.com/cayasde",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.idle.enabled": {
                         "type": "boolean",
-                        "default": false
+                        "default": true
                     },
                     "vscord.status.buttons.button1.idle.label": {
                         "type": "string",
-                        "default": "Idle Label Button 1",
+                        "default": "🐙 GitHub",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.idle.url": {
                         "type": "string",
-                        "default": "https://www.youtube.com/watch?v=dQw4w9WgXcQ",
+                        "default": "https://github.com/cayasde",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.git.active.enabled": {
@@ -881,12 +881,12 @@
                     },
                     "vscord.status.buttons.button1.git.active.label": {
                         "type": "string",
-                        "default": "View Repository",
+                        "default": "🐙 GitHub",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.git.active.url": {
                         "type": "string",
-                        "default": "{git_url}",
+                        "default": "https://github.com/cayasde",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.git.inactive.enabled": {
@@ -895,12 +895,12 @@
                     },
                     "vscord.status.buttons.button1.git.inactive.label": {
                         "type": "string",
-                        "default": "View Repository",
+                        "default": "🐙 GitHub",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.git.inactive.url": {
                         "type": "string",
-                        "default": "{git_url}",
+                        "default": "https://github.com/cayasde",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.git.idle.enabled": {
@@ -910,12 +910,12 @@
                     },
                     "vscord.status.buttons.button1.git.idle.label": {
                         "type": "string",
-                        "default": "View Repository",
+                        "default": "🐙 GitHub",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button1.git.idle.url": {
                         "type": "string",
-                        "default": "{git_url}",
+                        "default": "https://github.com/cayasde",
                         "minLength": 1
                     },
                     "vscord.status.buttons.button2.enabled": {
