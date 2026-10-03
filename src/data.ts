@@ -20,12 +20,12 @@ const ALLOWED_SCHEME = ["file", "vscode-remote", "untitled", "vsls"];
 const API_VERSION: Parameters<GitExtension["getAPI"]>["0"] = 1;
 // Numeric values mirror the Git extension's Status enum in src/@types/git.d.ts.
 const GIT_STATUS = {
+    INDEX_ADDED: 1,
     INDEX_DELETED: 2,
-    MODIFIED: 5,
+    INDEX_RENAMED: 3,
+    INDEX_COPIED: 4,
     DELETED: 6,
-    INTENT_TO_ADD: 9,
-    INTENT_TO_RENAME: 10,
-    TYPE_CHANGED: 11
+    INTENT_TO_ADD: 9
 } as const;
 
 function extractRepo(repos: Repository[], comparePath: string): Repository | undefined {
@@ -201,22 +201,19 @@ export class Data implements Disposable {
         const state = this._repo?.state;
         const indexChanges = state?.indexChanges ?? [];
         const workingTreeChanges = state?.workingTreeChanges ?? [];
-
-        const modifiedStatuses = [
-            GIT_STATUS.MODIFIED,
-            GIT_STATUS.TYPE_CHANGED,
-            GIT_STATUS.INTENT_TO_ADD,
-            GIT_STATUS.INTENT_TO_RENAME
-        ];
-        const modified = workingTreeChanges.filter(({ status }) => modifiedStatuses.includes(status)).length;
+        const renames = indexChanges.filter(({ status }) => status === GIT_STATUS.INDEX_RENAMED).length;
+        const added =
+            indexChanges.filter(({ status }) =>
+                [GIT_STATUS.INDEX_ADDED, GIT_STATUS.INDEX_COPIED, GIT_STATUS.INDEX_RENAMED].includes(status)
+            ).length +
+            workingTreeChanges.filter(({ status }) => status === GIT_STATUS.INTENT_TO_ADD).length +
+            (state?.untrackedChanges.length ?? 0);
         const deleted =
             indexChanges.filter(({ status }) => status === GIT_STATUS.INDEX_DELETED).length +
-            workingTreeChanges.filter(({ status }) => status === GIT_STATUS.DELETED).length;
-        const staged = indexChanges.length;
-        const untracked = state?.untrackedChanges.length ?? 0;
-        const conflicts = state?.mergeChanges.length ?? 0;
+            workingTreeChanges.filter(({ status }) => status === GIT_STATUS.DELETED).length +
+            renames;
 
-        return `S${staged} M${modified} ?${untracked} D${deleted} !${conflicts}`;
+        return `+${added} added · −${deleted} deleted`;
     }
 
     private async requireGit(): Promise<Extension<GitExtension> | undefined> {
