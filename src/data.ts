@@ -199,7 +199,8 @@ export class Data implements Disposable {
 
     public get gitStatusSummary(): string {
         const state = this._repo?.state;
-        if (!state) return "Working tree clean";
+        const indexChanges = state?.indexChanges ?? [];
+        const workingTreeChanges = state?.workingTreeChanges ?? [];
 
         const modifiedStatuses = [
             GIT_STATUS.MODIFIED,
@@ -207,23 +208,15 @@ export class Data implements Disposable {
             GIT_STATUS.INTENT_TO_ADD,
             GIT_STATUS.INTENT_TO_RENAME
         ];
-        const modified = state.workingTreeChanges.filter(({ status }) => modifiedStatuses.includes(status)).length;
+        const modified = workingTreeChanges.filter(({ status }) => modifiedStatuses.includes(status)).length;
         const deleted =
-            state.indexChanges.filter(({ status }) => status === GIT_STATUS.INDEX_DELETED).length +
-            state.workingTreeChanges.filter(({ status }) => status === GIT_STATUS.DELETED).length;
-        const summaryParts: Array<[number, string]> = [
-            [state.indexChanges.length, "S"],
-            [modified, "M"],
-            [state.untrackedChanges.length, "?"],
-            [deleted, "D"],
-            [state.mergeChanges.length, "!"]
-        ];
-        const summary = summaryParts
-            .filter(([count]) => count > 0)
-            .map(([count, label]) => `${label}${count}`)
-            .join(" ");
+            indexChanges.filter(({ status }) => status === GIT_STATUS.INDEX_DELETED).length +
+            workingTreeChanges.filter(({ status }) => status === GIT_STATUS.DELETED).length;
+        const staged = indexChanges.length;
+        const untracked = state?.untrackedChanges.length ?? 0;
+        const conflicts = state?.mergeChanges.length ?? 0;
 
-        return summary || "Working tree clean";
+        return `S${staged} M${modified} ?${untracked} D${deleted} !${conflicts}`;
     }
 
     private async requireGit(): Promise<Extension<GitExtension> | undefined> {
