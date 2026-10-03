@@ -1,7 +1,7 @@
 {
     "name": "vscord-browser-presence",
     "displayName": "VSCord Browser Presence",
-    "version": "0.1.5",
+    "version": "0.1.6",
     "description": "Discord Rich Presence for VS Code using the Discord Social SDK, without requiring the desktop client",
     "publisher": "cayasde",
     "license": "MIT",
@@ -373,7 +373,7 @@
                     },
                     "vscord.status.state.text.editing": {
                         "type": "string",
-                        "default": "Working on {relative_file_path}:{line_count}",
+                        "default": "Working on {folder_and_file}:{line_count}",
                         "description": "The text to show when editing a file."
                     },
                     "vscord.status.state.text.debugging": {
