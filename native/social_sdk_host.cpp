@@ -252,7 +252,7 @@ private:
     void setPresence(const std::vector<std::string>& fields)
     {
         discordpp::Activity activity{};
-        activity.SetType(discordpp::ActivityTypes::Playing);
+        activity.SetType(discordpp::ActivityTypes::Competing);
 
         const auto activityName = decodeBase64(fields[12]);
         if (!activityName.empty()) activity.SetName(activityName);
