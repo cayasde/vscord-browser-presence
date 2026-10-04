@@ -337,7 +337,7 @@
                     },
                     "vscord.status.details.text.reviewing": {
                         "type": "string",
-                        "default": "Reviewing changes",
+                        "default": "In {workspace} [{git_branch}]",
                         "description": "The text to show when reviewing a text diff."
                     },
                     "vscord.status.details.text.notInFile": {
