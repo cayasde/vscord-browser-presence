@@ -10,6 +10,7 @@ import {
     EventEmitter,
     type Extension,
     type TextEditor,
+    type Uri,
     type WorkspaceFolder,
     extensions,
     window,
@@ -118,11 +119,16 @@ export class Data implements Disposable {
     }
 
     public get folderAndFile(): string | undefined {
-        const _file = this.editor ? parse(this.editor.document.uri.fsPath) : undefined;
+        return this.getFolderAndFile(this.editor?.document.uri);
+    }
+
+    public getFolderAndFile(uri: Uri | undefined): string | undefined {
+        const _file = uri ? parse(uri.fsPath) : undefined;
         const directory = basename(_file?.dir ?? "");
         const file = _file ? _file.base : undefined;
+        const workspaceFolder = uri ? workspace.getWorkspaceFolder(uri) : undefined;
 
-        if (!directory || !this.workspaceFolder?.name || directory === this.workspaceFolder?.name) return file;
+        if (!directory || !workspaceFolder?.name || directory === workspaceFolder.name) return file;
 
         const v = `${directory}${sep}${file ?? ""}`;
         this.debug(`folderAndFile(): ${v}`);

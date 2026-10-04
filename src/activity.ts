@@ -277,7 +277,7 @@ export const activity = async (
                     const resolvedState = await replaceAllText(reviewingState);
                     const reviewedPath = privacyModeEnabled
                         ? "a file in a folder"
-                        : workspace.asRelativePath(reviewingDiff!, false).replaceAll(sep, "/");
+                        : dataClass.getFolderAndFile(reviewingDiff)?.replaceAll(sep, "/") ?? FAKE_EMPTY;
                     state = resolvedState.replaceAll(placeholder, reviewedPath);
                 }
             }
