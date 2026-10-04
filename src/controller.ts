@@ -1,4 +1,4 @@
-import { type Disposable, type WindowState, debug, languages, window, workspace } from "vscode";
+import { type Disposable, type Memento, type WindowState, debug, languages, window, workspace } from "vscode";
 import { type SetActivity } from "@xhayper/discord-rpc";
 import { SocialSdkClient, type SecureSecretStorage } from "./socialSdkClient";
 import type { GatewayActivityButton } from "discord-api-types/v10";
@@ -12,6 +12,14 @@ import { CONFIG_KEYS } from "./constants";
 import { getConfig } from "./config";
 import { dataClass } from "./data";
 
+const ELAPSED_TIME_STORAGE_KEY = "elapsedTimeSession";
+const MAX_ELAPSED_TIME_RESUME_GAP_MS = 20 * 60 * 1000;
+
+type PersistedElapsedTime = {
+    startTimestamp: number;
+    savedAt: number;
+};
+
 export class RPCController {
     listeners: Disposable[] = [];
     enabled = true;
@@ -24,6 +32,7 @@ export class RPCController {
 
     private idleTimeout: NodeJS.Timeout | undefined;
     private iconTimeout: NodeJS.Timeout | undefined;
+    private globalState: Memento | undefined;
     private activityThrottle = throttle(
         (isViewing?: boolean, isIdling?: boolean) => this.sendActivity(isViewing, isIdling),
         2000,
@@ -46,7 +55,9 @@ export class RPCController {
         this.client.on("disconnected", this.onDisconnected.bind(this));
     }
 
-    initialize(extensionPath: string, secrets: SecureSecretStorage): void {
+    initialize(extensionPath: string, secrets: SecureSecretStorage, globalState?: Memento): void {
+        this.globalState = globalState;
+        this.restoreElapsedTime();
         this.client.configure(extensionPath, secrets);
         if (!getConfig().get(CONFIG_KEYS.Enable)) return;
 
@@ -59,6 +70,50 @@ export class RPCController {
             await this.client?.destroy();
             logInfo("[002] Destroyed Discord Social SDK client");
         });
+    }
+
+    private restoreElapsedTime(): void {
+        const saved = this.globalState?.get<unknown>(ELAPSED_TIME_STORAGE_KEY);
+        if (!saved || typeof saved !== "object") return;
+
+        const { startTimestamp, savedAt } = saved as PersistedElapsedTime;
+        const now = Date.now();
+        if (
+            !getConfig().get(CONFIG_KEYS.Status.ShowElapsedTime) ||
+            !Number.isFinite(startTimestamp) ||
+            !Number.isFinite(savedAt) ||
+            savedAt > now ||
+            now - savedAt > MAX_ELAPSED_TIME_RESUME_GAP_MS
+        ) {
+            return;
+        }
+
+        this.state.startTimestamp = startTimestamp;
+        logInfo("Restored Rich Presence elapsed time from the previous VS Code session");
+    }
+
+    async persistElapsedTime(): Promise<void> {
+        if (!this.globalState) return;
+
+        const rawTimestamp = this.state.startTimestamp;
+        const startTimestamp = rawTimestamp instanceof Date ? rawTimestamp.getTime() : rawTimestamp;
+        try {
+            if (
+                !getConfig().get(CONFIG_KEYS.Status.ShowElapsedTime) ||
+                typeof startTimestamp !== "number" ||
+                !Number.isFinite(startTimestamp)
+            ) {
+                await this.globalState.update(ELAPSED_TIME_STORAGE_KEY, undefined);
+                return;
+            }
+
+            await this.globalState.update(ELAPSED_TIME_STORAGE_KEY, {
+                startTimestamp,
+                savedAt: Date.now()
+            } satisfies PersistedElapsedTime);
+        } catch (error) {
+            logError("Failed to persist Rich Presence elapsed time", error);
+        }
     }
 
     private onReady() {

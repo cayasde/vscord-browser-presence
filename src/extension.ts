@@ -188,7 +188,7 @@ export async function activate(ctx: ExtensionContext) {
     registerListeners(ctx);
 
     const contextWithSecrets = ctx as ExtensionContext & { secrets: SecureSecretStorage };
-    controller.initialize(ctx.extensionPath, contextWithSecrets.secrets);
+    controller.initialize(ctx.extensionPath, contextWithSecrets.secrets, ctx.globalState);
     if (!getConfig().get(CONFIG_KEYS.Enable)) {
         await controller.disable();
         editor.setStatusBarItem(StatusBarMode.Disabled);
@@ -199,6 +199,7 @@ export async function deactivate() {
     logInfo("Discord Rich Presence for VS Code deactivated.");
     editor.dispose();
     dataClass.dispose();
+    await controller.persistElapsedTime();
     await controller.destroy();
     logInfo("[004] Destroyed Discord Social SDK client");
 }
