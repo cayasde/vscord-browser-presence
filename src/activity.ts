@@ -25,7 +25,8 @@ export enum CURRENT_STATUS {
     NOT_IN_FILE = "notInFile",
     EDITING = "editing",
     DEBUGGING = "debugging",
-    VIEWING = "viewing"
+    VIEWING = "viewing",
+    REVIEWING = "reviewing"
 }
 
 export enum PROBLEM_LEVEL {
@@ -82,7 +83,8 @@ export const onDiagnosticsChange = () => {
 export const activity = async (
     previous: SetActivity = {},
     isViewing = false,
-    isIdling = false
+    isIdling = false,
+    isReviewingDiff = false
 ): Promise<SetActivity> => {
     const config = getConfig();
     const presence = previous;
@@ -130,13 +132,15 @@ export const activity = async (
             dataClass.workspaceName !== undefined &&
             isExcluded(config.get(CONFIG_KEYS.Ignore.Workspaces)!, dataClass.workspaceName);
 
-    const isNotInFile = !isWorkspaceExcluded && !dataClass.editor;
-
     const isDebugging = config.get(CONFIG_KEYS.Status.State.Debugging.Enabled) && !!debug.activeDebugSession;
     isViewing = !isDebugging && isViewing;
+    isReviewingDiff = !isDebugging && isReviewingDiff;
+
+    const isNotInFile = !isWorkspaceExcluded && !dataClass.editor && !isReviewingDiff;
 
     let status: CURRENT_STATUS;
     if (isIdling) status = CURRENT_STATUS.IDLE;
+    else if (isReviewingDiff) status = CURRENT_STATUS.REVIEWING;
     else if (isNotInFile) status = CURRENT_STATUS.NOT_IN_FILE;
     else if (isDebugging) status = CURRENT_STATUS.DEBUGGING;
     else if (isViewing) status = CURRENT_STATUS.VIEWING;
@@ -260,6 +264,17 @@ export const activity = async (
             smallImageText = await replaceAllText(config.get(CONFIG_KEYS.Status.Image.Small.Viewing.Text)!);
             break;
         }
+        case CURRENT_STATUS.REVIEWING: {
+            if (!isWorkspaceExcluded) {
+                if (detailsEnabled)
+                    details = await replaceAllText(config.get(CONFIG_KEYS.Status.Details.Text.Reviewing)!);
+                if (stateEnabled) state = await replaceAllText(config.get(CONFIG_KEYS.Status.State.Text.Reviewing)!);
+            }
+
+            largeImageKey = await replaceAllText(config.get(CONFIG_KEYS.Status.Image.Large.Reviewing.Key)!);
+            largeImageText = await replaceAllText(config.get(CONFIG_KEYS.Status.Image.Large.Reviewing.Text)!);
+            break;
+        }
         case CURRENT_STATUS.NOT_IN_FILE: {
             if (detailsEnabled) details = await replaceAllText(config.get(CONFIG_KEYS.Status.Details.Text.NotInFile)!);
             if (stateEnabled) state = await replaceAllText(config.get(CONFIG_KEYS.Status.State.Text.NotInFile)!);
@@ -358,6 +373,7 @@ export const getPresenceButtons = async (
           ? undefined
           : status == CURRENT_STATUS.EDITING ||
               status == CURRENT_STATUS.VIEWING ||
+              status == CURRENT_STATUS.REVIEWING ||
               status == CURRENT_STATUS.NOT_IN_FILE ||
               status == CURRENT_STATUS.DEBUGGING
             ? "Active"

@@ -42,6 +42,7 @@ export interface ExtensionConfigurationType {
     "status.details.text.viewing": string;
     "status.details.text.editing": string;
     "status.details.text.debugging": string;
+    "status.details.text.reviewing": string;
     "status.details.text.notInFile": string;
     "status.details.text.noWorkSpaceText": string;
     "status.state.enabled": boolean;
@@ -51,6 +52,7 @@ export interface ExtensionConfigurationType {
     "status.state.text.viewing": string;
     "status.state.text.editing": string;
     "status.state.text.debugging": string;
+    "status.state.text.reviewing": string;
     "status.state.text.notInFile": string;
     "status.state.text.noWorkspaceFound": string;
     "status.buttons": Buttons;
@@ -100,6 +102,8 @@ export interface ExtensionConfigurationType {
     "status.image.large.editing.text": string;
     "status.image.large.debugging.key": string;
     "status.image.large.debugging.text": string;
+    "status.image.large.reviewing.key": string;
+    "status.image.large.reviewing.text": string;
     "status.image.large.notInFile.key": string;
     "status.image.large.notInFile.text": string;
     "status.image.small.idle.key": string;

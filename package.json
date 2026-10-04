@@ -335,6 +335,11 @@
                         "default": "In {workspace} [{git_branch}]",
                         "description": "The text to show when viewing a file."
                     },
+                    "vscord.status.details.text.reviewing": {
+                        "type": "string",
+                        "default": "Reviewing changes",
+                        "description": "The text to show when reviewing a text diff."
+                    },
                     "vscord.status.details.text.notInFile": {
                         "type": "string",
                         "default": "Not in a file!",
@@ -386,6 +391,11 @@
                         "default": "Viewing {file_name}{file_extension}",
                         "description": "The text to show when viewing a file."
                     },
+                    "vscord.status.state.text.reviewing": {
+                        "type": "string",
+                        "default": "Reviewing {folder_and_file}",
+                        "description": "The text to show when reviewing a text diff."
+                    },
                     "vscord.status.state.text.notInFile": {
                         "type": "string",
                         "default": "",
@@ -421,6 +431,16 @@
                         "type": "string",
                         "default": "",
                         "description": "The large text to show when viewing a file."
+                    },
+                    "vscord.status.image.large.reviewing.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/cayasde/vscord-browser-presence/main/assets/icons/diff.png?v=reviewing",
+                        "description": "The image url to use when reviewing a text diff."
+                    },
+                    "vscord.status.image.large.reviewing.text": {
+                        "type": "string",
+                        "default": "Reviewing changes",
+                        "description": "The large text to show when reviewing a text diff."
                     },
                     "vscord.status.image.large.editing.key": {
                         "type": "string",

@@ -22,6 +22,25 @@ type PersistedElapsedTime = {
     cleanShutdown?: boolean;
 };
 
+type TabGroupsCompatibility = {
+    activeTabGroup?: { activeTab?: { input?: unknown } };
+    onDidChangeTabs?: (listener: () => void) => Disposable;
+    onDidChangeTabGroups?: (listener: () => void) => Disposable;
+};
+
+const getTabGroups = () => (window as unknown as { tabGroups?: TabGroupsCompatibility }).tabGroups;
+
+const isActiveTextDiff = (): boolean => {
+    const input = getTabGroups()?.activeTabGroup?.activeTab?.input;
+    return (
+        typeof input === "object" &&
+        input !== null &&
+        "original" in input &&
+        "modified" in input &&
+        !("notebookType" in input)
+    );
+};
+
 export class RPCController {
     listeners: Disposable[] = [];
     enabled = true;
@@ -182,6 +201,17 @@ export class RPCController {
                 this.checkIdle(window.state);
             }, 500);
         });
+        const tabGroups = getTabGroups();
+        const tabsChanged = tabGroups?.onDidChangeTabs?.(() => {
+            logInfo("onDidChangeTabs()");
+            this.activityThrottle.reset();
+            void this.activityThrottle.callable();
+        });
+        const tabGroupsChanged = tabGroups?.onDidChangeTabGroups?.(() => {
+            logInfo("onDidChangeTabGroups()");
+            this.activityThrottle.reset();
+            void this.activityThrottle.callable();
+        });
         const fileEdit = workspace.onDidChangeTextDocument((e) => {
             if (e.document !== dataClass.editor?.document) return;
             logInfo("onDidChangeTextDocument()");
@@ -217,6 +247,8 @@ export class RPCController {
         if (config.get(CONFIG_KEYS.Status.Idle.Check)) this.listeners.push(changeWindowState);
 
         this.listeners.push(fileSwitch, fileEdit, fileSelectionChanged, debugStart, debugEnd, gitInfoChange);
+        if (tabsChanged) this.listeners.push(tabsChanged);
+        if (tabGroupsChanged) this.listeners.push(tabGroupsChanged);
     }
 
     private checkCanSend(isIdling: boolean): boolean {
@@ -283,7 +315,7 @@ export class RPCController {
         if (!this.enabled) return;
         if (this.manualIdleMode) isIdling = this.manualIdling;
         this.checkCanSend(isIdling);
-        this.state = await activity(this.state, isViewing, isIdling);
+        this.state = await activity(this.state, isViewing, isIdling, isActiveTextDiff());
         this.persistElapsedTimeIfChanged();
         this.state.instance = true;
         if (!this.state || Object.keys(this.state).length === 0 || !this.canSendActivity)
