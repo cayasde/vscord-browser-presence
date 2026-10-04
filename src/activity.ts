@@ -12,6 +12,7 @@ import { sep } from "node:path";
 import {
     type Selection,
     type TextDocument,
+    type Uri,
     DiagnosticSeverity,
     debug,
     env,
@@ -84,7 +85,7 @@ export const activity = async (
     previous: SetActivity = {},
     isViewing = false,
     isIdling = false,
-    isReviewingDiff = false
+    reviewingDiff?: Uri
 ): Promise<SetActivity> => {
     const config = getConfig();
     const presence = previous;
@@ -134,7 +135,7 @@ export const activity = async (
 
     const isDebugging = config.get(CONFIG_KEYS.Status.State.Debugging.Enabled) && !!debug.activeDebugSession;
     isViewing = !isDebugging && isViewing;
-    isReviewingDiff = !isDebugging && isReviewingDiff;
+    const isReviewingDiff = !isDebugging && !!reviewingDiff;
 
     const isNotInFile = !isWorkspaceExcluded && !dataClass.editor && !isReviewingDiff;
 
@@ -268,7 +269,17 @@ export const activity = async (
             if (!isWorkspaceExcluded) {
                 if (detailsEnabled)
                     details = await replaceAllText(config.get(CONFIG_KEYS.Status.Details.Text.Reviewing)!);
-                if (stateEnabled) state = await replaceAllText(config.get(CONFIG_KEYS.Status.State.Text.Reviewing)!);
+                if (stateEnabled) {
+                    const placeholder = "__VSCORD_REVIEWING_FILE__";
+                    const reviewingState = config
+                        .get(CONFIG_KEYS.Status.State.Text.Reviewing)!
+                        .replaceAll("{folder_and_file}", placeholder);
+                    const resolvedState = await replaceAllText(reviewingState);
+                    const reviewedPath = privacyModeEnabled
+                        ? "a file in a folder"
+                        : workspace.asRelativePath(reviewingDiff!, false).replaceAll(sep, "/");
+                    state = resolvedState.replaceAll(placeholder, reviewedPath);
+                }
             }
 
             largeImageKey = await replaceAllText(config.get(CONFIG_KEYS.Status.Image.Large.Reviewing.Key)!);

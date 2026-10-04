@@ -1,4 +1,4 @@
-import { type Disposable, type Memento, type WindowState, debug, languages, window, workspace } from "vscode";
+import { type Disposable, type Memento, type Uri, type WindowState, debug, languages, window, workspace } from "vscode";
 import { type SetActivity } from "@xhayper/discord-rpc";
 import { SocialSdkClient, type SecureSecretStorage } from "./socialSdkClient";
 import type { GatewayActivityButton } from "discord-api-types/v10";
@@ -30,15 +30,20 @@ type TabGroupsCompatibility = {
 
 const getTabGroups = () => (window as unknown as { tabGroups?: TabGroupsCompatibility }).tabGroups;
 
-const isActiveTextDiff = (): boolean => {
+type TextDiffInputCompatibility = { original: Uri; modified: Uri };
+
+const getActiveTextDiff = (): TextDiffInputCompatibility | undefined => {
     const input = getTabGroups()?.activeTabGroup?.activeTab?.input;
-    return (
-        typeof input === "object" &&
-        input !== null &&
-        "original" in input &&
-        "modified" in input &&
-        !("notebookType" in input)
-    );
+    if (
+        typeof input !== "object" ||
+        input === null ||
+        !("original" in input) ||
+        !("modified" in input) ||
+        "notebookType" in input
+    )
+        return undefined;
+
+    return input as TextDiffInputCompatibility;
 };
 
 export class RPCController {
@@ -315,7 +320,7 @@ export class RPCController {
         if (!this.enabled) return;
         if (this.manualIdleMode) isIdling = this.manualIdling;
         this.checkCanSend(isIdling);
-        this.state = await activity(this.state, isViewing, isIdling, isActiveTextDiff());
+        this.state = await activity(this.state, isViewing, isIdling, getActiveTextDiff()?.modified);
         this.persistElapsedTimeIfChanged();
         this.state.instance = true;
         if (!this.state || Object.keys(this.state).length === 0 || !this.canSendActivity)

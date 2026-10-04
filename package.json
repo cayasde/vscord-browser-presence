@@ -434,12 +434,12 @@
                     },
                     "vscord.status.image.large.reviewing.key": {
                         "type": "string",
-                        "default": "https://raw.githubusercontent.com/cayasde/vscord-browser-presence/main/assets/icons/diff.png?v=reviewing",
+                        "default": "https://raw.githubusercontent.com/cayasde/vscord-browser-presence/main/assets/icons/diff.png?v=reviewing-v2",
                         "description": "The image url to use when reviewing a text diff."
                     },
                     "vscord.status.image.large.reviewing.text": {
                         "type": "string",
-                        "default": "Reviewing changes",
+                        "default": "",
                         "description": "The large text to show when reviewing a text diff."
                     },
                     "vscord.status.image.large.editing.key": {
