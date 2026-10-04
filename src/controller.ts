@@ -19,6 +19,7 @@ const ELAPSED_TIME_AUTOSAVE_INTERVAL_MS = 30 * 1000;
 type PersistedElapsedTime = {
     startTimestamp: number;
     savedAt: number;
+    cleanShutdown?: boolean;
 };
 
 export class RPCController {
@@ -80,20 +81,25 @@ export class RPCController {
         const saved = this.globalState?.get<unknown>(ELAPSED_TIME_STORAGE_KEY);
         if (!saved || typeof saved !== "object") return;
 
-        const { startTimestamp, savedAt } = saved as PersistedElapsedTime;
+        const { startTimestamp, savedAt, cleanShutdown } = saved as PersistedElapsedTime;
         const now = Date.now();
+        const maxResumeGap =
+            cleanShutdown === false
+                ? MAX_ELAPSED_TIME_RESUME_GAP_MS + ELAPSED_TIME_AUTOSAVE_INTERVAL_MS
+                : MAX_ELAPSED_TIME_RESUME_GAP_MS;
         if (
             !getConfig().get(CONFIG_KEYS.Status.ShowElapsedTime) ||
             !Number.isFinite(startTimestamp) ||
             !Number.isFinite(savedAt) ||
             savedAt > now ||
-            now - savedAt > MAX_ELAPSED_TIME_RESUME_GAP_MS
+            now - savedAt > maxResumeGap
         ) {
             return;
         }
 
         this.state.startTimestamp = startTimestamp;
         this.persistedElapsedTimeStartTimestamp = startTimestamp;
+        void this.persistElapsedTime();
         logInfo("Restored Rich Presence elapsed time from the previous VS Code session");
     }
 
@@ -110,10 +116,10 @@ export class RPCController {
     async stopElapsedTimeAutoSave(): Promise<void> {
         if (this.elapsedTimeAutoSaveInterval) clearInterval(this.elapsedTimeAutoSaveInterval);
         this.elapsedTimeAutoSaveInterval = undefined;
-        await this.persistElapsedTime();
+        await this.persistElapsedTime(true);
     }
 
-    async persistElapsedTime(): Promise<void> {
+    async persistElapsedTime(cleanShutdown = false): Promise<void> {
         if (!this.globalState) return;
 
         const rawTimestamp = this.state.startTimestamp;
@@ -131,7 +137,8 @@ export class RPCController {
 
             await this.globalState.update(ELAPSED_TIME_STORAGE_KEY, {
                 startTimestamp,
-                savedAt: Date.now()
+                savedAt: Date.now(),
+                cleanShutdown
             } satisfies PersistedElapsedTime);
             this.persistedElapsedTimeStartTimestamp = startTimestamp;
         } catch (error) {
