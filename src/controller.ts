@@ -14,6 +14,7 @@ import { dataClass } from "./data";
 
 const ELAPSED_TIME_STORAGE_KEY = "elapsedTimeSession";
 const MAX_ELAPSED_TIME_RESUME_GAP_MS = 20 * 60 * 1000;
+const ELAPSED_TIME_AUTOSAVE_INTERVAL_MS = 30 * 1000;
 
 type PersistedElapsedTime = {
     startTimestamp: number;
@@ -33,6 +34,8 @@ export class RPCController {
     private idleTimeout: NodeJS.Timeout | undefined;
     private iconTimeout: NodeJS.Timeout | undefined;
     private globalState: Memento | undefined;
+    private elapsedTimeAutoSaveInterval: NodeJS.Timeout | undefined;
+    private persistedElapsedTimeStartTimestamp: number | undefined;
     private activityThrottle = throttle(
         (isViewing?: boolean, isIdling?: boolean) => this.sendActivity(isViewing, isIdling),
         2000,
@@ -58,6 +61,7 @@ export class RPCController {
     initialize(extensionPath: string, secrets: SecureSecretStorage, globalState?: Memento): void {
         this.globalState = globalState;
         this.restoreElapsedTime();
+        this.startElapsedTimeAutoSave();
         this.client.configure(extensionPath, secrets);
         if (!getConfig().get(CONFIG_KEYS.Enable)) return;
 
@@ -89,7 +93,24 @@ export class RPCController {
         }
 
         this.state.startTimestamp = startTimestamp;
+        this.persistedElapsedTimeStartTimestamp = startTimestamp;
         logInfo("Restored Rich Presence elapsed time from the previous VS Code session");
+    }
+
+    private startElapsedTimeAutoSave(): void {
+        if (!this.globalState || this.elapsedTimeAutoSaveInterval) return;
+
+        this.elapsedTimeAutoSaveInterval = setInterval(() => {
+            if (!getConfig().get(CONFIG_KEYS.Status.ShowElapsedTime)) return;
+            void this.persistElapsedTime();
+        }, ELAPSED_TIME_AUTOSAVE_INTERVAL_MS);
+        this.elapsedTimeAutoSaveInterval.unref();
+    }
+
+    async stopElapsedTimeAutoSave(): Promise<void> {
+        if (this.elapsedTimeAutoSaveInterval) clearInterval(this.elapsedTimeAutoSaveInterval);
+        this.elapsedTimeAutoSaveInterval = undefined;
+        await this.persistElapsedTime();
     }
 
     async persistElapsedTime(): Promise<void> {
@@ -104,6 +125,7 @@ export class RPCController {
                 !Number.isFinite(startTimestamp)
             ) {
                 await this.globalState.update(ELAPSED_TIME_STORAGE_KEY, undefined);
+                this.persistedElapsedTimeStartTimestamp = undefined;
                 return;
             }
 
@@ -111,9 +133,19 @@ export class RPCController {
                 startTimestamp,
                 savedAt: Date.now()
             } satisfies PersistedElapsedTime);
+            this.persistedElapsedTimeStartTimestamp = startTimestamp;
         } catch (error) {
             logError("Failed to persist Rich Presence elapsed time", error);
         }
+    }
+
+    private persistElapsedTimeIfChanged(): void {
+        const rawTimestamp = this.state.startTimestamp;
+        const startTimestamp = rawTimestamp instanceof Date ? rawTimestamp.getTime() : rawTimestamp;
+        if (startTimestamp === this.persistedElapsedTimeStartTimestamp) return;
+
+        this.persistedElapsedTimeStartTimestamp = startTimestamp;
+        void this.persistElapsedTime();
     }
 
     private onReady() {
@@ -245,6 +277,7 @@ export class RPCController {
         if (this.manualIdleMode) isIdling = this.manualIdling;
         this.checkCanSend(isIdling);
         this.state = await activity(this.state, isViewing, isIdling);
+        this.persistElapsedTimeIfChanged();
         this.state.instance = true;
         if (!this.state || Object.keys(this.state).length === 0 || !this.canSendActivity)
             return void this.client.user?.clearActivity(process.pid);

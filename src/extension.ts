@@ -199,7 +199,7 @@ export async function deactivate() {
     logInfo("Discord Rich Presence for VS Code deactivated.");
     editor.dispose();
     dataClass.dispose();
-    await controller.persistElapsedTime();
+    await controller.stopElapsedTimeAutoSave();
     await controller.destroy();
     logInfo("[004] Destroyed Discord Social SDK client");
 }
