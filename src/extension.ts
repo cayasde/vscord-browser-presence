@@ -165,6 +165,14 @@ export const registerCommands = (ctx: ExtensionContext) => {
             await window.showInformationMessage("Stopped Idling.");
     });
 
+    const toggleTerminalPresenceCommand = commands.registerCommand(
+        "vscordBrowser.toggleTerminalPresence",
+        async (isUsingTerminal?: boolean) => {
+            controller.setTerminalFocus(isUsingTerminal);
+            await commands.executeCommand("workbench.action.terminal.toggleTerminal");
+        }
+    );
+
     ctx.subscriptions.push(
         enableCommand,
         disableCommand,
@@ -175,7 +183,8 @@ export const registerCommands = (ctx: ExtensionContext) => {
         enablePrivacyModeCommand,
         disablePrivacyModeCommand,
         startIdlingCommand,
-        stopIdlingCommand
+        stopIdlingCommand,
+        toggleTerminalPresenceCommand
     );
 
     logInfo("Registered Discord Rich Presence commands");

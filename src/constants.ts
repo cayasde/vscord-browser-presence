@@ -28,6 +28,7 @@ export const CONFIG_KEYS = {
             Text: {
                 Idle: "status.details.text.idle" as const,
                 Editing: "status.details.text.editing" as const,
+                Terminal: "status.details.text.terminal" as const,
                 Viewing: "status.details.text.viewing" as const,
                 Reviewing: "status.details.text.reviewing" as const,
                 NotInFile: "status.details.text.notInFile" as const,
@@ -46,6 +47,7 @@ export const CONFIG_KEYS = {
             Text: {
                 Idle: "status.state.text.idle" as const,
                 Editing: "status.state.text.editing" as const,
+                Terminal: "status.state.text.terminal" as const,
                 Debugging: "status.state.text.debugging" as const,
                 Viewing: "status.state.text.viewing" as const,
                 Reviewing: "status.state.text.reviewing" as const,
@@ -134,6 +136,10 @@ export const CONFIG_KEYS = {
                 Editing: {
                     Key: "status.image.large.editing.key" as const,
                     Text: "status.image.large.editing.text" as const
+                } as const,
+                Terminal: {
+                    Key: "status.image.large.terminal.key" as const,
+                    Text: "status.image.large.terminal.text" as const
                 } as const,
                 Debugging: {
                     Key: "status.image.large.debugging.key" as const,

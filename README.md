@@ -32,6 +32,7 @@ See Discord's [Social SDK getting started guide](https://discord.com/developers/
 - Support custom images (using HTTP link)
 - Support custom button link!
 - Detect when you are Debugging!
+- Detect when you are using the integrated terminal!
 - Detect when you are using the [Insiders build](https://code.visualstudio.com/insiders/)!
 - Detect when you are Idling!
 

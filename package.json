@@ -1,7 +1,7 @@
 {
     "name": "vscord-browser-presence",
     "displayName": "VSCord Browser Presence",
-    "version": "0.1.21",
+    "version": "0.1.27",
     "description": "Discord Rich Presence for VS Code using the Discord Social SDK, without requiring the desktop client",
     "publisher": "cayasde",
     "license": "MIT",
@@ -110,6 +110,30 @@
                 "command": "vscordBrowser.stopIdling",
                 "title": "Stop Idle",
                 "category": "VSCord"
+            }
+        ],
+        "views": {
+            "explorer": [
+                {
+                    "id": "vscordBrowser.terminalFocusBridgeV2",
+                    "name": "VSCord Focus",
+                    "when": "terminalFocus",
+                    "visibility": "visible"
+                }
+            ]
+        },
+        "keybindings": [
+            {
+                "command": "vscordBrowser.toggleTerminalPresence",
+                "key": "ctrl+`",
+                "when": "terminalFocus",
+                "args": false
+            },
+            {
+                "command": "vscordBrowser.toggleTerminalPresence",
+                "key": "ctrl+`",
+                "when": "!terminalFocus",
+                "args": true
             }
         ],
         "configuration": [
@@ -325,6 +349,11 @@
                         "default": "In {workspace} [{git_branch}]",
                         "description": "The text to show when editing a file."
                     },
+                    "vscord.status.details.text.terminal": {
+                        "type": "string",
+                        "default": "In {workspace} [{git_branch}]",
+                        "description": "The text to show when using the integrated terminal."
+                    },
                     "vscord.status.details.text.debugging": {
                         "type": "string",
                         "default": "Debugging {file_name}{file_extension}",
@@ -375,6 +404,11 @@
                         "type": "string",
                         "default": "",
                         "description": "The text to show when idling."
+                    },
+                    "vscord.status.state.text.terminal": {
+                        "type": "string",
+                        "default": "Using the terminal",
+                        "description": "The lower text to show when using the integrated terminal."
                     },
                     "vscord.status.state.text.editing": {
                         "type": "string",
@@ -451,6 +485,16 @@
                         "type": "string",
                         "default": "",
                         "description": "The large text to show when editing a file."
+                    },
+                    "vscord.status.image.large.terminal.key": {
+                        "type": "string",
+                        "default": "https://raw.githubusercontent.com/cayasde/vscord-browser-presence/main/assets/icons/terminal.png?v=0.1.26",
+                        "description": "The image url to use when using the integrated terminal."
+                    },
+                    "vscord.status.image.large.terminal.text": {
+                        "type": "string",
+                        "default": "Integrated Terminal",
+                        "description": "The large text to show when using the integrated terminal."
                     },
                     "vscord.status.image.large.debugging.key": {
                         "type": "string",

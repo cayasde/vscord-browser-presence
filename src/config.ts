@@ -41,6 +41,7 @@ export interface ExtensionConfigurationType {
     "status.details.text.idle": string;
     "status.details.text.viewing": string;
     "status.details.text.editing": string;
+    "status.details.text.terminal": string;
     "status.details.text.debugging": string;
     "status.details.text.reviewing": string;
     "status.details.text.notInFile": string;
@@ -51,6 +52,7 @@ export interface ExtensionConfigurationType {
     "status.state.text.idle": string;
     "status.state.text.viewing": string;
     "status.state.text.editing": string;
+    "status.state.text.terminal": string;
     "status.state.text.debugging": string;
     "status.state.text.reviewing": string;
     "status.state.text.notInFile": string;
@@ -100,6 +102,8 @@ export interface ExtensionConfigurationType {
     "status.image.large.viewing.text": string;
     "status.image.large.editing.key": string;
     "status.image.large.editing.text": string;
+    "status.image.large.terminal.key": string;
+    "status.image.large.terminal.text": string;
     "status.image.large.debugging.key": string;
     "status.image.large.debugging.text": string;
     "status.image.large.reviewing.key": string;

@@ -24,6 +24,7 @@ import {
 export enum CURRENT_STATUS {
     IDLE = "idle",
     NOT_IN_FILE = "notInFile",
+    TERMINAL = "terminal",
     EDITING = "editing",
     DEBUGGING = "debugging",
     VIEWING = "viewing",
@@ -85,6 +86,7 @@ export const activity = async (
     previous: SetActivity = {},
     isViewing = false,
     isIdling = false,
+    isUsingTerminal = false,
     reviewingDiff?: Uri
 ): Promise<SetActivity> => {
     const config = getConfig();
@@ -141,6 +143,7 @@ export const activity = async (
 
     let status: CURRENT_STATUS;
     if (isIdling) status = CURRENT_STATUS.IDLE;
+    else if (isUsingTerminal) status = CURRENT_STATUS.TERMINAL;
     else if (isReviewingDiff) status = CURRENT_STATUS.REVIEWING;
     else if (isNotInFile) status = CURRENT_STATUS.NOT_IN_FILE;
     else if (isDebugging) status = CURRENT_STATUS.DEBUGGING;
@@ -286,6 +289,17 @@ export const activity = async (
             largeImageText = await replaceAllText(config.get(CONFIG_KEYS.Status.Image.Large.Reviewing.Text)!);
             break;
         }
+        case CURRENT_STATUS.TERMINAL: {
+            if (!isWorkspaceExcluded) {
+                if (detailsEnabled)
+                    details = await replaceAllText(config.get(CONFIG_KEYS.Status.Details.Text.Terminal)!);
+                if (stateEnabled) state = await replaceAllText(config.get(CONFIG_KEYS.Status.State.Text.Terminal)!);
+            }
+
+            largeImageKey = await replaceAllText(config.get(CONFIG_KEYS.Status.Image.Large.Terminal.Key)!);
+            largeImageText = await replaceAllText(config.get(CONFIG_KEYS.Status.Image.Large.Terminal.Text)!);
+            break;
+        }
         case CURRENT_STATUS.NOT_IN_FILE: {
             if (detailsEnabled) details = await replaceAllText(config.get(CONFIG_KEYS.Status.Details.Text.NotInFile)!);
             if (stateEnabled) state = await replaceAllText(config.get(CONFIG_KEYS.Status.State.Text.NotInFile)!);
@@ -385,6 +399,7 @@ export const getPresenceButtons = async (
           : status == CURRENT_STATUS.EDITING ||
               status == CURRENT_STATUS.VIEWING ||
               status == CURRENT_STATUS.REVIEWING ||
+              status == CURRENT_STATUS.TERMINAL ||
               status == CURRENT_STATUS.NOT_IN_FILE ||
               status == CURRENT_STATUS.DEBUGGING
             ? "Active"

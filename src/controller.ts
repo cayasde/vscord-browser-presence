@@ -1,4 +1,4 @@
-import { type Disposable, type Memento, type Uri, type WindowState, debug, languages, window, workspace } from "vscode";
+import { type Disposable, type Memento, type Uri, type WindowState, debug, languages, TreeItem, window, workspace } from "vscode";
 import { type SetActivity } from "@xhayper/discord-rpc";
 import { SocialSdkClient, type SecureSecretStorage } from "./socialSdkClient";
 import type { GatewayActivityButton } from "discord-api-types/v10";
@@ -58,6 +58,7 @@ export class RPCController {
 
     private idleTimeout: NodeJS.Timeout | undefined;
     private iconTimeout: NodeJS.Timeout | undefined;
+    private isUsingTerminal = false;
     private globalState: Memento | undefined;
     private elapsedTimeAutoSaveInterval: NodeJS.Timeout | undefined;
     private persistedElapsedTimeStartTimestamp: number | undefined;
@@ -194,16 +195,33 @@ export class RPCController {
 
     private listen() {
         const config = getConfig();
-
-        const fileSwitch = window.onDidChangeActiveTextEditor((e) => {
-            logInfo("onDidChangeActiveTextEditor()");
-            if (e) {
-                this.activityThrottle.reset();
-                void this.activityThrottle.callable();
-                return;
+        const terminalFocusBridge = window.createTreeView<string>("vscordBrowser.terminalFocusBridgeV2", {
+            treeDataProvider: {
+                getChildren: () => [],
+                getTreeItem: (item) => new TreeItem(item)
             }
+        });
+        this.isUsingTerminal = terminalFocusBridge.visible || (!window.activeTextEditor && !!window.activeTerminal);
+
+        const terminalFocusSwitch = terminalFocusBridge.onDidChangeVisibility(({ visible }) => {
+            logInfo(`onDidChangeTerminalFocus(${visible})`);
+            this.isUsingTerminal = visible;
+            this.activityThrottle.reset();
+            void this.activityThrottle.callable();
+        });
+        const activeTerminalSwitch = window.onDidChangeActiveTerminal((terminal) => {
+            logInfo(`onDidChangeActiveTerminal(${terminal ? "active" : "undefined"})`);
+            this.isUsingTerminal = terminal !== undefined;
+            this.activityThrottle.reset();
+            void this.activityThrottle.callable();
+        });
+
+        const fileSwitch = window.onDidChangeActiveTextEditor(() => {
+            logInfo("onDidChangeActiveTextEditor()");
             setTimeout(() => {
                 this.checkIdle(window.state);
+                this.activityThrottle.reset();
+                void this.activityThrottle.callable();
             }, 500);
         });
         const tabGroups = getTabGroups();
@@ -220,12 +238,14 @@ export class RPCController {
         const fileEdit = workspace.onDidChangeTextDocument((e) => {
             if (e.document !== dataClass.editor?.document) return;
             logInfo("onDidChangeTextDocument()");
+            this.isUsingTerminal = false;
             this.activityThrottle.reset();
             void this.activityThrottle.callable();
         });
         const fileSelectionChanged = window.onDidChangeTextEditorSelection((e) => {
             if (e.textEditor !== dataClass.editor) return;
             logInfo("onDidChangeTextEditorSelection()");
+            this.isUsingTerminal = false;
             this.activityThrottle.reset();
             void this.activityThrottle.callable();
         });
@@ -251,9 +271,26 @@ export class RPCController {
         if (config.get(CONFIG_KEYS.Status.Problems.Enabled)) this.listeners.push(diagnosticsChange);
         if (config.get(CONFIG_KEYS.Status.Idle.Check)) this.listeners.push(changeWindowState);
 
-        this.listeners.push(fileSwitch, fileEdit, fileSelectionChanged, debugStart, debugEnd, gitInfoChange);
+        this.listeners.push(
+            terminalFocusBridge,
+            terminalFocusSwitch,
+            activeTerminalSwitch,
+            fileSwitch,
+            fileEdit,
+            fileSelectionChanged,
+            debugStart,
+            debugEnd,
+            gitInfoChange
+        );
         if (tabsChanged) this.listeners.push(tabsChanged);
         if (tabGroupsChanged) this.listeners.push(tabGroupsChanged);
+    }
+
+    setTerminalFocus(isUsingTerminal?: boolean) {
+        this.isUsingTerminal = isUsingTerminal ?? !this.isUsingTerminal;
+        logInfo(`setTerminalFocus(${this.isUsingTerminal})`);
+        this.activityThrottle.reset();
+        void this.activityThrottle.callable();
     }
 
     private checkCanSend(isIdling: boolean): boolean {
@@ -320,7 +357,7 @@ export class RPCController {
         if (!this.enabled) return;
         if (this.manualIdleMode) isIdling = this.manualIdling;
         this.checkCanSend(isIdling);
-        this.state = await activity(this.state, isViewing, isIdling, getActiveTextDiff()?.modified);
+        this.state = await activity(this.state, isViewing, isIdling, this.isUsingTerminal, getActiveTextDiff()?.modified);
         this.persistElapsedTimeIfChanged();
         this.state.instance = true;
         if (!this.state || Object.keys(this.state).length === 0 || !this.canSendActivity)
