@@ -1,7 +1,7 @@
 {
     "name": "vscord-browser-presence",
     "displayName": "VSCord Browser Presence",
-    "version": "0.1.27",
+    "version": "0.1.28",
     "description": "Discord Rich Presence for VS Code using the Discord Social SDK, without requiring the desktop client",
     "publisher": "cayasde",
     "license": "MIT",
@@ -493,7 +493,7 @@
                     },
                     "vscord.status.image.large.terminal.text": {
                         "type": "string",
-                        "default": "Integrated Terminal",
+                        "default": "",
                         "description": "The large text to show when using the integrated terminal."
                     },
                     "vscord.status.image.large.debugging.key": {
